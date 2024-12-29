@@ -3,6 +3,7 @@ import random
 import time
 import gym
 from collections import defaultdict
+import cv2
 
 def choose_action(state, q_table, epsilon, action_space):
     """Choose an action using epsilon-greedy strategy."""
@@ -39,10 +40,6 @@ def monte_carlo(env, episodes, gamma, epsilon, epsilon_decay):
             total_reward += reward
             state = next_state
 
-            # Render every 10 episodes for visualization
-            if episode % 10 == 0:
-                env.render()
-
             if done or truncated:
                 print(f"Episode finished with total reward: {total_reward}\n")
                 break
@@ -64,31 +61,42 @@ def monte_carlo(env, episodes, gamma, epsilon, epsilon_decay):
     print(f"Total time for Monte Carlo: {elapsed_time:.2f} seconds")
     return q_table, elapsed_time
 
-def visualize_policy(env, q_table):
-    """Visualize the policy derived from the Q-table."""
+def save_visualization_as_video(env, q_table, filename="optimal_policy.mp4", fps=2):
+    """Save a video of the agent following the optimal policy."""
     state = env.reset()
     if isinstance(state, tuple):
         state = state[0]
 
-    env.render()
+    frames = []  # To store frames for the video
     total_reward = 0
 
-    print("\nVisualizing Optimal Policy:")
+    print("\nSaving Optimal Policy as Video:")
     while True:
-        action = np.argmax(q_table[state])
+        frame = env.render()  # Get the frame
+        frames.append(frame)
+
+        action = np.argmax(q_table[state])  # Choose optimal action
         result = env.step(action)
         state, reward, done, truncated, _ = result
         total_reward += reward
-        env.render()
-        time.sleep(0.5)  # Pause for better visualization
 
         if done or truncated:
             print(f"Finished with total reward: {total_reward}")
             break
 
+    # Convert frames to a video
+    height, width, layers = frames[0].shape
+    video = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height))
+
+    for frame in frames:
+        video.write(frame)
+
+    video.release()
+    print(f"Optimal policy video saved to {filename}")
+
 if __name__ == "__main__":
     # Create FrozenLake environment
-    env = gym.make("FrozenLake-v1", is_slippery=False, render_mode="human")
+    env = gym.make("FrozenLake-v1", is_slippery=False, render_mode="rgb_array")
 
     # Hyperparameters
     episodes = 100
@@ -99,9 +107,8 @@ if __name__ == "__main__":
     # Train Monte Carlo
     q_table_mc, mc_time = monte_carlo(env, episodes, gamma, epsilon, epsilon_decay)
 
-    # Visualize learned policies
-    print("\n--- Visualizing Monte Carlo Policy ---")
-    visualize_policy(env, q_table_mc)
+    # Save the visualization of the optimal policy as a video
+    save_visualization_as_video(env, q_table_mc, filename="optimal_policy.mp4")
 
     # Summary of results
     print("\nMonte Carlo Training Time:")
