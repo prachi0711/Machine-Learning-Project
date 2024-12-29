@@ -29,15 +29,15 @@ The SARSA (State-Action-Reward-State-Action) algorithm is an on-policy RL algori
 
 SARSA updates the Q-value (the expected future reward for a state-action pair) using the following formula:
 
-\[
+$[
 Q(S, A) \leftarrow Q(S, A) + \alpha \left[ R + \gamma Q(S', A') - Q(S, A) \right]
-\]
+]$
 
 Where:
-- \( \alpha \): Learning rate.
-- \( \gamma \): Discount factor, which determines the importance of future rewards.
-- \( R \): Reward for taking action \( A \) in state \( S \).
-- \( S' \), \( A' \): The next state and action.
+- $( \alpha )$: Learning rate.
+- $( \gamma )$: Discount factor, which determines the importance of future rewards.
+- $( R )$: Reward for taking action \( A \) in state \( S \).
+- $( S' )$, $( A' )$: The next state and action.
 
 ---
 
@@ -50,14 +50,14 @@ The Monte Carlo (MC) algorithm is a model-free reinforcement learning technique 
 1. **Initialization**: Start with an empty or randomly initialized Q-table.
 2. **Episode Generation**: Generate episodes by interacting with the environment using an epsilon-greedy policy.
 3. **Return Calculation**:
-   - Compute the **return** \( G \) for each state-action pair in the episode:
-     \[
+   - Compute the **return** $( G )$ for each state-action pair in the episode:
+     $(
      G = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \ldots
-     \]
-     where \( \gamma \) is the discount factor.
+     )$
+     where $( \gamma )$ is the discount factor.
 4. **Update Q-Values**:
    - For each state-action pair encountered in the episode:
-     - Append the return \( G \) to the list of returns for that pair.
+     - Append the return $( G )$ to the list of returns for that pair.
      - Update the Q-value as the average of the accumulated returns.
 
 ---
