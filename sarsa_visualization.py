@@ -5,6 +5,7 @@ import gym
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+import cv2
 
 def initialize_q_table(states, actions):
     """Initialize the Q-table with small random values."""
@@ -155,6 +156,38 @@ def plot_state_values(maze, q_table, rewards,episodes, grid_size, title="State V
     g.show()
     plt.show()
 
+def save_visualization_as_video(env, q_table, filename="optimal_policy.mp4", fps=2):
+    """Save a video of the agent following the optimal policy."""
+    state = env.reset()
+    if isinstance(state, tuple):
+        state = state[0]
+
+    frames = []  # To store frames for the video
+    total_reward = 0
+
+    print("\nSaving Optimal Policy as Video:")
+    while True:
+        frame = env.render()  # Get the frame
+        frames.append(frame)
+
+        action = np.argmax(q_table[state])  # Choose optimal action
+        result = env.step(action)
+        state, reward, done, truncated, _ = result
+        total_reward += reward
+
+        if done or truncated:
+            print(f"Finished with total reward: {total_reward}")
+            break
+
+    # Convert frames to a video
+    height, width, layers = frames[0].shape
+    video = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height))
+
+    for frame in frames:
+        video.write(frame)
+
+    video.release()
+    print(f"Optimal policy video saved to {filename}")
 
 if __name__ == "__main__":
     # Create FrozenLake environment
@@ -173,6 +206,7 @@ if __name__ == "__main__":
     # Visualize the learned policy
     print("\n--- Visualizing SARSA Policy ---")
     visualize_sarsa_policy(env, q_table)
+    save_visualization_as_video(env, q_table,filename="optimal_policy_sarsa.mp4")
 
     maze = np.array(env.desc)
     episodes=np.linspace(1,episodes,episodes)
