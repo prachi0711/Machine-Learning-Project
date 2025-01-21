@@ -8,7 +8,7 @@ import pandas as pd
 
 def initialize_q_table(states, actions):
     """Initialize the Q-table with small random values."""
-    return np.random.uniform(low=-0.01, high=0.01, size=(states, actions))
+    return np.zeros((states, actions))
 
 def choose_action(state, q_table, epsilon):
     """Choose an action using epsilon-greedy strategy."""
@@ -102,6 +102,58 @@ def visualize_sarsa_policy(env, q_table):
         if done or truncated:
             print(f"Finished with total reward: {total_reward}")
             break
+def plot_state_values(maze, q_table, rewards,episodes, grid_size, title="State Values"):
+    """
+    Visualize the state action values Q in each walkable square after training.
+    """
+    fig, ax = plt.subplots(figsize=(8, 8))
+
+    policy=[]
+    for i in range(q_table.shape[0]):
+        policy.append(q_table[i][np.argmax(q_table[i])])
+
+    policy=np.array(policy)
+    policy=np.reshape(policy,(4,4))
+
+    # Draw the maze grid
+    for row in range(grid_size[0]):
+        for col in range(grid_size[1]):
+            cell_value = maze[row, col]
+
+            # Walls or Holes
+            if cell_value == b'H':  # 'H' is for holes in FrozenLake
+                ax.add_patch(plt.Rectangle((col, grid_size[0] - row - 1), 1, 1, color="gray"))
+                ax.text(col + 0.5, grid_size[0] - row - 0.5, "-", ha="center", va="center", fontsize=16, color="black")
+            # Start or Goal
+            elif cell_value in [b'S', b'G']:
+                ax.add_patch(plt.Rectangle((col, grid_size[0] - row - 1), 1, 1, color="lightblue"))
+                ax.text(col + 0.5, grid_size[0] - row - 0.5, cell_value.decode("utf-8"), ha="center", va="center", fontsize=16, color="black")
+            # Walkable cells
+            elif cell_value == b'F':  # 'F' is for frozen walkable cells
+                state = row * grid_size[1] + col
+                state_value = policy[row,col]  # Default to 0.00 if state is missing
+                ax.text(col + 0.5, grid_size[0] - row - 0.5, f"{state_value:.3f}", ha="center", va="center", fontsize=12, color="blue")
+
+    # Draw grid lines
+    for i in range(grid_size[0] + 1):
+        ax.plot([0, grid_size[1]], [i, i], color='black', linewidth=1)
+    for j in range(grid_size[1] + 1):
+        ax.plot([j, j], [0, grid_size[0]], color='black', linewidth=1)
+
+    ax.set_xlim(0, grid_size[1])
+    ax.set_ylim(0, grid_size[0])
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_title(title)
+    fig.show()
+
+    #Plot Reward Data
+    g=plt.figure(2)
+    plt.plot(episodes,rewards)
+    plt.xlabel('Episode')
+    plt.ylabel('Reward')
+    g.show()
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -109,11 +161,11 @@ if __name__ == "__main__":
     env = gym.make("FrozenLake-v1", is_slippery=False, render_mode="rgb_array")
 
     # Hyperparameters
-    episodes = 1000
-    alpha = 0.4  # Learning rate
-    gamma = 0.6  # Discount factor
-    epsilon = 0.4  # Exploration rate
-    epsilon_decay = 0.995
+    episodes = 5000
+    alpha = 0.5  # Learning rate
+    gamma = 0.99  # Discount factor
+    epsilon = 1.0  # Exploration rate
+    epsilon_decay = 0.999
 
     # Train SARSA
     q_table,rewards = sarsa(env, episodes, alpha, gamma, epsilon, epsilon_decay)
@@ -122,13 +174,9 @@ if __name__ == "__main__":
     print("\n--- Visualizing SARSA Policy ---")
     visualize_sarsa_policy(env, q_table)
 
+    maze = np.array(env.desc)
     episodes=np.linspace(1,episodes,episodes)
-    training_data={'episodes':episodes,'rewards':rewards}
-    data=pd.DataFrame(training_data)
 
-    #Plotting training information
-    plt.plot(episodes,rewards)
-    plt.xlabel('Episode')
-    plt.ylabel('Reward')
-    plt.show()
+    #PLotting Results
+    plot_state_values(maze, q_table, rewards, episodes, grid_size=(maze.shape[0], maze.shape[1]), title="Q Values After Training")
     
