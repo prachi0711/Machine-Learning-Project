@@ -99,10 +99,10 @@ if __name__ == "__main__":
     env = gym.make("FrozenLake-v1", is_slippery=False, render_mode="rgb_array")
 
     # Hyperparameters
-    episodes = 100
-    gamma = 0.99  # Discount factor
-    epsilon = 1.0  # Exploration rate
-    epsilon_decay = 0.995
+    episodes = 5000
+    gamma = 0.99 # Discount factor
+    epsilon = 1.0 # Exploration rate
+    epsilon_decay = 0.999 # Decay
 
     # Train Monte Carlo
     q_table_mc, mc_time = monte_carlo(env, episodes, gamma, epsilon, epsilon_decay)

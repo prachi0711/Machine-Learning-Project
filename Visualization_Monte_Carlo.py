@@ -136,7 +136,7 @@ def plot_state_values(maze, q_table, grid_size, title="State Values"):
 
 if __name__ == "__main__":
     # Create FrozenLake environment
-    env = gym.make("FrozenLake-v1", is_slippery=False, render_mode="human")
+    env = gym.make("FrozenLake-v1", is_slippery=False, render_mode="rgb_array")
 
     maze = np.array(env.desc) 
 
@@ -146,7 +146,7 @@ if __name__ == "__main__":
 
 
     # Hyperparameters
-    episodes = 1000
+    episodes = 5000
     gamma = 0.99 # Discount factor
     epsilon = 1.0 # Exploration rate
     epsilon_decay = 0.999 # Decay
