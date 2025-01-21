@@ -1,40 +1,125 @@
-### Escape from a maze using reinforcement learning
+# 🌟 **Machine Learning Project: Comparing RL Models on a Maze** 🌟
 
-##### Solving an optimization problem using an MDP and TD learning
+## 🚀 **Introduction**
 
-The environment for this problem is a maze with walls and a single exit. An agent (the learner and decision maker) is placed somewhere in the maze. The agents' goal is to reach the exit as quickly as possible. To get there the agent moves through the maze in a succession of steps. For every step the agent must decide which action to take. The options are move left, right, up or down. For this purpose the agent is trained; it learns a policy (Q) which tells what is the best next move to make. With every step the agent incurs a penalty or - when finally reaching the exit - a reward. These penalties and rewards are the input when training the policy. 
+Welcome to our **Reinforcement Learning Maze Project**! 🎯 This project compares the performance of two popular RL algorithms, **SARSA** and **Monte Carlo**, as they learn to navigate a maze. 🗺️ Our goal is to evaluate their efficiency, learning strategies, and overall behavior in solving the maze puzzle. 🧩  
 
-![Maze](https://github.com/erikdelange/Reinforcement-Learning-Maze/blob/master/maze.png)
+By the end of this project, you'll gain insights into the strengths and weaknesses of these algorithms while observing their performance visually! 📊✨
 
-The values for the penalties and rewards are defined in class *Maze* in *maze.py*:
-```python
-    reward_exit = 10.0  # reward for reaching the exit cell
-    penalty_move = -0.05  # penalty for a move which did not result in finding the exit cell
-    penalty_visited = -0.25  # penalty for returning to a cell which was visited earlier
-    penalty_impossible_move = -0.75  # penalty for trying to enter an occupied cell or moving out of the maze
-```
-The policies (or models) used here are based on Sarsa and Q-learning. During training the learning algorithm updates the action-value function Q for each state which is visited. The most preferable action is indicated by the highest value. Updating these values is based on the reward or penalty incurred after the action was taken. With TD-learning a model learns at every step it takes, not only when the exit is reached. However, learning does speed up once the exit has been reached for the first time. 
+---
 
-This project demonstrates different models which learn to move through a maze. Class Maze in file *maze.py* in package *environment* defines the environment including the rules of the game (rewards, penalties). In file *main.py* an example of a maze is defined (but you can create your own) as a np.array. By selecting a value for *test* from enum Test a certain model is trained and can then be used to play a number of games from different starting positions in the maze. When training or playing the agents moves can be plotted by calling Maze.render(Render.MOVES). To also display the progress of training call Maze.render(Render.TRAINING). This visualizes the most preferred action per cell. The higher the value the greener the arrow is displayed.
+## 🎓 **Course and Contributors**
 
-![Maze](https://github.com/erikdelange/Reinforcement-Learning-Maze/blob/master/bestmove.png)
+This project is part of the **Masters in Autonomous Systems** program for the **Machine Learning** course, under the mentorship of **Professor Sebastian Houben**.  
 
-Package *models* contains the following models:
-1. *RandomModel* is the simplest model and just selects the next move randomly. It is [dumb all over](https://www.youtube.com/watch?v=DR_wf92A8E4) and learns nothing. You are lucky if you get to the exit using this model.
-2. *QTableModel* uses a table to record the value of each (state, action) pair. For a state the highest value indicates the most desirable action. These values are constantly refined during training. This is a fast way to learn a policy.
-3. *SarsaTableModel* uses a similar setup as the previous model, but takes less risk during learning (= on-policy learning).
-4. *QTableTraceModel* is an extension of the QTableModel. It speeds up learning by keeping track of previously visited state-action pairs, and updates their values as well although with a decaying rate.
-5. *SarsaTableTraceModel* is a variant of SarsaTableModel but adds an eligibility trace, just as QTableTraceModel. 
-6. *QReplayNetworkModel* is a simple neural network which learns the relation between a state and the corresponding values by replaying previous moves. It is significantly slower than all other models, and an overkill for a problem with such a small state space. As an extra feature after learning it saves the model to disk so this can be loaded later for a next game. This is typically how you would use a neural network in a real world situation where training is separated from actual use. 
+### 🤝 **Contributors**
+- **Prachi Sheth** 🌟  
+- **Amol Tatkari** 🌟  
+- **Vedika Chauhan** 🌟  
+- **Trushar Ghanekar** 🌟  
 
-The table below gives an impression of the relative performance of each of these models (on my PC):
+---
 
-| Model | Trained | Average no of episodes | Average training time |
-| --- | --- | --- | --- | 
-| QTableModel | 10 times | 149.5 | 16.5 sec |
-| QTableTraceModel | 10 times | 87.0 | 5.2 sec |
-| SarsaTableModel | 10 times | 114.0 | 11.7 sec |
-| SarsaTableTraceModel | 10 times | 73.0 | 5.5 sec |
-| QReplayNetworkModel | 10 times | 113.5 | 4 min 48 sec |
+## 📚 **Reinforcement Learning Models**
 
-Requires matplotlib, numpy, keras and tensorflow.
+In this project, we evaluate two reinforcement learning algorithms:
+
+### 1️⃣ **SARSA**  
+An **on-policy** algorithm that learns the value of the policy being executed. It updates Q-values at each step of an episode using the agent's current policy. ⚙️
+
+### 2️⃣ **Monte Carlo**  
+A **model-free** algorithm that relies on episodic sampling. It computes Q-values based on the cumulative returns observed at the end of an episode. 🔄
+
+---
+
+## 🧠 **How They Work**
+
+### 🟦 **SARSA Algorithm**  
+SARSA stands for **State-Action-Reward-State-Action** and follows these steps:
+1. **State (S)**: Start in a state in the maze.  
+2. **Action (A)**: Choose an action based on the policy (e.g., epsilon-greedy).  
+3. **Reward (R)**: Receive feedback based on the action taken.  
+4. **Next State (S')**: Move to a new state.  
+5. **Next Action (A')**: Choose the next action based on the policy.  
+
+#### Formula for Updating Q-values:
+$[
+Q(S, A) \leftarrow Q(S, A) + \alpha \left[ R + \gamma Q(S', A') - Q(S, A) \right]
+]$
+
+- **Parameters**:  
+- $( \alpha )$: Learning rate.
+- $( \gamma )$: Discount factor, which determines the importance of future rewards.
+- $( R )$: Reward for taking action \( A \) in state \( S \).
+- $( S' )$, $( A' )$: The next state and action.
+
+---
+
+### 🟩 **Monte Carlo Algorithm**  
+Monte Carlo learns by sampling **complete episodes** and updating Q-values based on cumulative returns. 🌐
+
+#### Steps:
+1. **Initialize Q-Table**: Start with an empty or randomly initialized table.  
+2. **Episode Generation**: Interact with the maze environment to generate episodes.  
+3. **Calculate Return (G)**:
+   - Compute the **return** $( G )$ for each state-action pair in the episode:
+     $(
+     G = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \ldots
+     )$
+     where $( \gamma )$ is the discount factor.
+4. **Update Q-values**:
+   - For each state-action pair in the episode, update the Q-value as the **average of observed returns**.  
+
+---
+
+## 🔍 **Environment and Visualization**
+
+The environment used is the **FrozenLake** maze from OpenAI Gym 🧊.  
+- The maze is represented as a gridworld where the agent learns to navigate to the goal efficiently. 🏁  
+
+**Visualization Tools**:  
+- `Visualization_Monte_Carlo.py` 🟩: For visualizing the Monte Carlo algorithm.  
+- `sarsa_visualization.py` 🟦: For visualizing the SARSA algorithm.  
+
+---
+
+## 🏆 **Comparison and Observations**
+
+| 🔢 **Algorithm**   | 🏅 **Average Reward** | ⏱️ **Training Time (s)** | 📜 **Policy Type** |
+|--------------------|-----------------------|--------------------------|--------------------|
+| **SARSA**          | TBD                   | 0.05                    | On-policy          |
+| **Monte Carlo**    | TBD                   | 0.22                    | Off-policy         |
+
+### 🗝️ **Key Observations**
+- **SARSA**: Learns from each step during training, adapting based on its policy. It is sensitive to the current policy being executed.  
+- **Monte Carlo**: Relies on complete episodes, making it slower but more precise in environments with well-defined episodic tasks.  
+
+---
+
+## 📂 **Project Files**
+
+1. **`ML_Project_Both_Algorithm.ipynb`**: Contains the implementation and comparison of SARSA and Monte Carlo algorithms.  
+2. **`Visualization_Monte_Carlo.py`**: Script for visualizing the Monte Carlo algorithm.  
+3. **`sarsa_visualization.py`**: Script for visualizing the SARSA algorithm.  
+
+---
+
+## 📖 **References**
+
+- 🌐 [SARSA Reinforcement Learning](https://www.geeksforgeeks.org/sarsa-reinforcement-learning/)  
+- 🌐 [Reinforcement Learning Maze Project](https://github.com/erikdelange/Reinforcement-Learning-Maze)  
+
+---
+## 📝 **License**
+
+This project is licensed under the **MIT License**.  
+
+### License Details:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:  
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  
+
+**THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.**
+
+
+💡 **Happy Learning!** 😊
