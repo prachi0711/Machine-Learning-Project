@@ -85,10 +85,10 @@ The environment used is the **FrozenLake** maze from OpenAI Gym 🧊.
 
 ## 🏆 **Comparison and Observations**
 
-| 🔢 **Algorithm**   | 🏅 **Average Reward** | ⏱️ **Training Time (s)** | 📜 **Policy Type** |
-|--------------------|-----------------------|--------------------------|--------------------|
-| **SARSA**          | TBD                   | 0.05                    | On-policy          |
-| **Monte Carlo**    | TBD                   | 0.22                    | Off-policy         |
+| 🔢 **Algorithm**   | ⏱️ **Training Time (s)** | 📜 **Policy Type** |
+|--------------------|--------------------------|--------------------|
+| **SARSA**          | 0.90                     | On-policy          |
+| **Monte Carlo**    | 8.83                     | Off-policy         |
 
 ### 🗝️ **Key Observations**
 - **SARSA**: Learns from each step during training, adapting based on its policy. It is sensitive to the current policy being executed.  
